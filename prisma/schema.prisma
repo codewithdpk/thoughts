@@ -1,0 +1,68 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  passwordHash String
+  name         String?
+  createdAt    DateTime  @default(now())
+  notes        Note[]
+  thoughts     Thought[]
+}
+
+// Standalone documents.
+model Note {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String   @default("Untitled")
+  content   String   @default("") // sanitized HTML
+  excerpt   String   @default("") // plain-text snippet for the list
+  pinned    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId, updatedAt])
+}
+
+// Graph documents: connected to each other through ThoughtLink edges.
+model Thought {
+  id        String        @id @default(cuid())
+  userId    String
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String        @default("Untitled")
+  content   String        @default("")
+  excerpt   String        @default("")
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  outgoing  ThoughtLink[] @relation("source")
+  incoming  ThoughtLink[] @relation("target")
+
+  @@index([userId, updatedAt])
+}
+
+enum LinkKind {
+  INLINE // derived from [[wiki-links]] in the content
+  MANUAL // added from the links panel
+}
+
+model ThoughtLink {
+  id        String   @id @default(cuid())
+  sourceId  String
+  targetId  String
+  source    Thought  @relation("source", fields: [sourceId], references: [id], onDelete: Cascade)
+  target    Thought  @relation("target", fields: [targetId], references: [id], onDelete: Cascade)
+  kind      LinkKind
+  label     String?
+  createdAt DateTime @default(now())
+
+  @@unique([sourceId, targetId, kind])
+  @@index([targetId])
+}

@@ -1,26 +1,70 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-sans: var(--font-lato), "Helvetica Neue", Arial, sans-serif;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: #fff;
+  color: #1d1c1d; /* Slack's text color */
+  font-family: var(--font-sans);
 }
+
+@layer components {
+  .input {
+    @apply w-full rounded-md border border-neutral-200 bg-white px-2.5 py-1.5 text-sm outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-200;
+  }
+  .header-btn {
+    @apply rounded px-2 py-1 text-xs text-neutral-500 hover:bg-neutral-100 hover:text-neutral-900;
+  }
+}
+
+/* ---------- Editor (TipTap / ProseMirror) ---------- */
+.journal-editor {
+  font-family: var(--font-lato), sans-serif;
+  font-size: 17px;
+  line-height: 1.6;
+  max-width: 46rem;
+  margin: 0 auto;
+  padding: 2rem 2rem 6rem;
+  min-height: 100%;
+  outline: none;
+}
+.journal-editor > * + * { margin-top: 0.6em; }
+.journal-editor h1 { font-size: 1.75rem; font-weight: 900; line-height: 1.25; }
+.journal-editor h2 { font-size: 1.35rem; font-weight: 700; line-height: 1.3; margin-top: 1.2em; }
+.journal-editor h3 { font-size: 1.1rem; font-weight: 700; margin-top: 1em; }
+.journal-editor ul { list-style: disc; padding-left: 1.5rem; }
+.journal-editor ol { list-style: decimal; padding-left: 1.5rem; }
+.journal-editor blockquote { border-left: 3px solid #e5e5e5; padding-left: 1rem; color: #616061; }
+.journal-editor code { background: #f6f6f6; border: 1px solid #e8e8e8; border-radius: 3px; padding: 0 0.25em; font-size: 0.9em; color: #e01e5a; }
+.journal-editor pre { background: #f8f8f8; border: 1px solid #e8e8e8; border-radius: 6px; padding: 0.75rem 1rem; font-size: 0.9em; }
+.journal-editor pre code { background: none; border: 0; color: inherit; padding: 0; }
+.journal-editor a { color: #1264a3; text-decoration: underline; text-underline-offset: 2px; }
+.journal-editor hr { border-color: #e5e5e5; margin: 1.5em 0; }
+
+.journal-editor ul[data-type="taskList"] { list-style: none; padding-left: 0.25rem; }
+.journal-editor ul[data-type="taskList"] li { display: flex; gap: 0.5rem; align-items: flex-start; }
+.journal-editor ul[data-type="taskList"] li > label { margin-top: 0.2em; }
+.journal-editor ul[data-type="taskList"] li[data-checked="true"] > div { color: #a3a3a3; text-decoration: line-through; }
+
+.journal-editor p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  color: #a3a3a3;
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+/* [[thought links]] */
+.journal-editor a.thought-link {
+  color: #b45309;
+  background: #fef3c7;
+  border-radius: 4px;
+  padding: 0 4px;
+  text-decoration: none;
+  cursor: pointer;
+}
+.journal-editor a.thought-link::before { content: "[["; opacity: 0.4; }
+.journal-editor a.thought-link::after { content: "]]"; opacity: 0.4; }
+.journal-editor .suggestion { color: #b45309; }
