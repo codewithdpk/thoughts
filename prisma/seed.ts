@@ -9,7 +9,11 @@ const prisma = new PrismaClient({ adapter: new PrismaPg(pgConfig()) });
 async function main() {
   const email = process.env.SEED_EMAIL?.toLowerCase().trim();
   const password = process.env.SEED_PASSWORD;
-  if (!email || !password) throw new Error("SEED_EMAIL and SEED_PASSWORD must be set");
+  if (!email || !password) {
+    // Runs on every Vercel build, so a missing var shouldn't fail the deploy.
+    console.warn("SEED_EMAIL / SEED_PASSWORD not set, skipping user seed");
+    return;
+  }
 
   const passwordHash = await bcrypt.hash(password, 12);
   const user = await prisma.user.upsert({
